@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dalio School · Plataforma Educativa</title>
+<meta name="description" content="Plataforma educativa distribuida para Dalio School - Inglés y Francés." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Fondo animado (siempre presente) -->
+<div class="bg-grid"></div>
+<div class="bg-orbs">
+  <span class="orb orb-purple"></span>
+  <span class="orb orb-blue"></span>
+  <span class="orb orb-yellow"></span>
+  <span class="orb orb-orange"></span>
+</div>
+
+<!-- ============================================================ -->
+<!-- PANTALLA DE LOGIN                                            -->
+<!-- futura autenticación: reemplazar validación local con API    -->
+<!-- ============================================================ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card glass">
+
+    <!-- Logo circular -->
+    <div class="login-logo">
+      <div class="logo-ring login-ring">
+        <div class="logo-inner login-inner">
+          <span class="dl c1">d</span>
+          <span class="dl c2">a</span>
+          <span class="dl c3">l</span>
+          <span class="dl c4">i</span>
+          <span class="dl c5">o</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-header">
+      <h2 class="login-title">Dalio <span class="grad">School</span></h2>
+      <p class="login-subtitle">Inglés · Francés · Asesorías</p>
+    </div>
+
+    <!-- Formulario de login -->
+    <!-- futura API: POST /api/auth/login { email, password, role } -->
+    <div class="login-form">
+
+      <div class="form-group" id="emailGroup">
+        <label class="form-label">Correo electrónico</label>
+        <div class="form-input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email" />
+        </div>
+        <span class="form-error" id="emailError"></span>
+      </div>
+
+      <div class="form-group" id="passGroup">
+        <label class="form-label">Contraseña</label>
+        <div class="form-input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" />
+          <button class="toggle-pass" id="togglePass" type="button" aria-label="Mostrar contraseña">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <span class="form-error" id="passError"></span>
+      </div>
+
+      <!-- Selector de rol -->
+      <!-- futura DB: el rol también se valida en el backend -->
+      <div class="form-group">
+        <label class="form-label">Ingresar como</label>
+        <div class="role-selector">
+          <button class="role-btn active" data-role="alumno" id="roleAlumno">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            Alumno
+          </button>
+          <button class="role-btn" data-role="maestro" id="roleMaestro">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/><path d="M19 3l1.5 1.5L18 7"/></svg>
+            Maestro
+          </button>
+        </div>
+      </div>
+
+      <span class="form-error form-error-global" id="loginError"></span>
+
+      <button class="btn btn-primary btn-login" id="loginBtn">
+        <span id="loginBtnText">Iniciar Sesión</span>
+        <span class="login-spinner" id="loginSpinner"></span>
+      </button>
+
+      <!-- Demo hint -->
+      <p class="demo-hint">
+        Demo: usa cualquier email válido + mínimo 6 caracteres<br>
+        <strong>alumno@dalio.mx</strong> / <strong>maestro@dalio.mx</strong>
+      </p>
+    </div>
+
+  </div>
+</div>
+<!-- / LOGIN -->
+
+
+<!-- ============================================================ -->
+<!-- APP PRINCIPAL (visible tras login)                           -->
+<!-- ============================================================ -->
+<div class="app" id="mainApp" style="display:none;">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <span class="d d1">d</span><span class="d d2">a</span><span class="d d3">l</span><span class="d d4">i</span><span class="d d5">o</span>
+      </div>
+      <div class="brand-text">
+        <strong>Dalio</strong>
+        <small>School</small>
+      </div>
+    </div>
+
+    <!-- Nav Alumno -->
+    <!-- futura DB: items generados dinámicamente según materias del alumno -->
+    <nav class="nav" id="navAlumno">
+      <a class="nav-item active" href="#dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 9h8V3h-8z"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" href="#materias">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M8 7h8M8 11h6"/></svg>
+        <span>Materias</span>
+      </a>
+      <a class="nav-item" href="#tareas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        <span>Tareas</span>
+      </a>
+      <a class="nav-item" href="#materiales">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        <span>Materiales</span>
+      </a>
+      <a class="nav-item" href="#examenes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Exámenes</span>
+      </a>
+      <a class="nav-item" href="#calificaciones">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+        <span>Calificaciones</span>
+      </a>
+      <a class="nav-item" href="#progreso">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Mi Progreso</span>
+      </a>
+      <a class="nav-item" href="#arquitectura">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span>Arquitectura</span>
+      </a>
+      <a class="nav-item" href="#simulador">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Simulación</span>
+      </a>
+    </nav>
+
+    <!-- Nav Maestro -->
+    <!-- futura DB: items según materias asignadas al maestro -->
+    <nav class="nav" id="navMaestro" style="display:none;">
+      <a class="nav-item active" href="#dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 9h8V3h-8z"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" href="#gestionar-alumnos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Alumnos</span>
+      </a>
+      <a class="nav-item" href="#subir-tareas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M12 12v6M9 15l3-3 3 3"/></svg>
+        <span>Subir Tareas</span>
+      </a>
+      <a class="nav-item" href="#crear-examenes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Crear Exámenes</span>
+      </a>
+      <a class="nav-item" href="#subir-materiales">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6M9 15l3-3 3 3"/></svg>
+        <span>Materiales</span>
+      </a>
+      <a class="nav-item" href="#capturar-calificaciones">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+        <span>Calificaciones</span>
+      </a>
+      <a class="nav-item" href="#metricas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Métricas</span>
+      </a>
+      <a class="nav-item" href="#arquitectura">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span>Arquitectura</span>
+      </a>
+      <a class="nav-item" href="#simulador">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Simulación</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-pill"><span class="dot"></span> Sistema OK</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <header class="header glass">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Buscar materiales, tareas, alumnos..." />
+      </div>
+
+      <div class="header-right">
+        <div class="status-online">
+          <span class="online-dot"></span>
+          <div>
+            <strong class="user-role-badge" id="userRoleBadge">Alumno</strong>
+            <small id="userEmailDisplay">—</small>
+          </div>
+        </div>
+
+        <button class="icon-btn" aria-label="Notificaciones">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="badge">3</span>
+        </button>
+
+        <button class="icon-btn" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+
+        <div class="avatar" id="userAvatar"><span>DS</span></div>
+      </div>
+    </header>
+
+
+    <!-- ================================================================ -->
+    <!-- PANEL ALUMNO                                                      -->
+    <!-- futura DB: todos los datos de aquí vienen de /api/alumno/{id}    -->
+    <!-- ================================================================ -->
+    <div id="panelAlumno">
+
+      <!-- HERO Alumno -->
+      <section class="hero glass" id="dashboard">
+        <div class="hero-text">
+          <span class="tag">Dalio School · Plataforma Educativa</span>
+          <h1>Hola, <span class="grad" id="alumnoNombre">Alumno</span> 👋</h1>
+          <p>Bienvenido a tu espacio de aprendizaje. Aquí encontrarás tus materias, tareas, exámenes y materiales de <strong>Inglés y Francés</strong>.</p>
+          <div class="hero-cta">
+            <a href="#tareas" class="btn btn-primary">Ver Tareas Pendientes</a>
+            <a href="#examenes" class="btn btn-ghost">Próximos Exámenes</a>
+          </div>
+        </div>
+        <div class="hero-logo">
+          <div class="logo-ring">
+            <div class="logo-inner">
+              <span class="dl c1">d</span>
+              <span class="dl c2">a</span>
+              <span class="dl c3">l</span>
+              <span class="dl c4">i</span>
+              <span class="dl c5">o</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MÉTRICAS ALUMNO -->
+      <!-- futura API: GET /api/alumno/{id}/stats -->
+      <section class="metrics">
+        <div class="metric glass">
+          <span class="m-label">Tareas pendientes</span>
+          <strong class="m-value">3</strong>
+          <span class="m-delta down">esta semana</span>
+        </div>
+        <div class="metric glass">
+          <span class="m-label">Promedio general</span>
+          <strong class="m-value">9.2</strong>
+          <span class="m-delta up">+0.3 este mes</span>
+        </div>
+        <div class="metric glass">
+          <span class="m-label">Clases asistidas</span>
+          <strong class="m-value">18<small>/20</small></strong>
+          <div class="bar"><span style="width:90%"></span></div>
+        </div>
+        <div class="metric glass">
+          <span class="m-label">Exámenes aprobados</span>
+          <strong class="m-value">5<small>/5</small></strong>
+          <span class="m-delta up">100%</span>
+        </div>
+        <div class="metric glass">
+          <span class="m-label">Materiales leídos</span>
+          <strong class="m-value" data-metric="users">12</strong>
+          <span class="m-delta up">de 15</span>
+        </div>
+      </section>
+
+      <!-- MATERIAS -->
+      <!-- futura DB: SELECT * FROM materias WHERE alumno_id = ? -->
+      <section class="section" id="materias">
+        <div class="section-head">
+          <span class="tag purple">Mis materias</span>
+          <h2>Cursos activos</h2>
+          <p>Niveles en los que estás inscrito este ciclo.</p>
+        </div>
+        <div class="materias-grid">
+          <div class="materia-card glass purple-glow">
+            <div class="materia-icon">🇬🇧</div>
+            <div class="materia-info">
+              <strong>Inglés Intermedio</strong>
+              <small>Nivel B1 · 3 hrs/sem</small>
+            </div>
+            <div class="materia-meta">
+              <div class="bar" style="margin-top:8px;"><span style="width:72%"></span></div>
+              <small style="color:var(--muted);font-size:11px;">72% completado</small>
+            </div>
+            <span class="materia-badge">En curso</span>
+          </div>
+          <div class="materia-card glass blue-glow">
+            <div class="materia-icon">🇫🇷</div>
+            <div class="materia-info">
+              <strong>Francés Básico</strong>
+              <small>Nivel A1 · 2 hrs/sem</small>
+            </div>
+            <div class="materia-meta">
+              <div class="bar" style="margin-top:8px;"><span style="width:45%"></span></div>
+              <small style="color:var(--muted);font-size:11px;">45% completado</small>
+            </div>
+            <span class="materia-badge blue">En curso</span>
+          </div>
+          <div class="materia-card glass yellow-glow">
+            <div class="materia-icon">🔤</div>
+            <div class="materia-info">
+              <strong>Conversación Avanzada</strong>
+              <small>Inglés · 2 hrs/sem</small>
+            </div>
+            <div class="materia-meta">
+              <div class="bar" style="margin-top:8px;"><span style="width:88%"></span></div>
+              <small style="color:var(--muted);font-size:11px;">88% completado</small>
+            </div>
+            <span class="materia-badge yellow">Próximo a terminar</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAREAS -->
+      <!-- futura DB: SELECT * FROM tareas WHERE alumno_id = ? ORDER BY fecha_entrega -->
+      <section class="section" id="tareas">
+        <div class="section-head">
+          <span class="tag orange">Tareas</span>
+          <h2>Mis tareas</h2>
+          <p>Tareas pendientes y entregadas.</p>
+        </div>
+        <div class="task-list glass">
+          <div class="task-item">
+            <div class="task-status pending"></div>
+            <div class="task-info">
+              <strong>Ensayo: My Daily Routine</strong>
+              <small>Inglés Intermedio · Entrega: 15 mayo 2026</small>
+            </div>
+            <span class="task-badge pending">Pendiente</span>
+          </div>
+          <div class="task-item">
+            <div class="task-status pending"></div>
+            <div class="task-info">
+              <strong>Vocabulaire: La famille</strong>
+              <small>Francés Básico · Entrega: 13 mayo 2026</small>
+            </div>
+            <span class="task-badge pending">Pendiente</span>
+          </div>
+          <div class="task-item">
+            <div class="task-status pending"></div>
+            <div class="task-info">
+              <strong>Diálogo: At the Restaurant</strong>
+              <small>Conversación Avanzada · Entrega: 18 mayo 2026</small>
+            </div>
+            <span class="task-badge pending">Pendiente</span>
+          </div>
+          <div class="task-item">
+            <div class="task-status done"></div>
+            <div class="task-info">
+              <strong>Reading: The London Eye</strong>
+              <small>Inglés Intermedio · Entregado: 5 mayo 2026</small>
+            </div>
+            <span class="task-badge done">Entregada ✓</span>
+          </div>
+          <div class="task-item">
+            <div class="task-status done"></div>
+            <div class="task-info">
+              <strong>Exercices: Les couleurs</strong>
+              <small>Francés Básico · Entregado: 3 mayo 2026</small>
+            </div>
+            <span class="task-badge done">Entregada ✓</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- MATERIALES -->
+      <!-- futura DB: SELECT * FROM materiales WHERE materia_id IN (materias_alumno) -->
+      <section class="section" id="materiales">
+        <div class="section-head">
+          <span class="tag blue">Materiales</span>
+          <h2>Recursos de estudio</h2>
+          <p>Archivos, videos y lecturas subidos por tu maestro.</p>
+        </div>
+        <div class="feed-grid">
+          <article class="feed-card purple-bg">
+            <span class="feed-tag">📄 PDF</span>
+            <h3>Grammar Guide B1</h3>
+            <p>Guía completa de gramática inglesa nivel intermedio.</p>
+          </article>
+          <article class="feed-card blue-bg">
+            <span class="feed-tag">🎧 Audio</span>
+            <h3>Listening Practice</h3>
+            <p>Ejercicios de comprensión auditiva con nativos.</p>
+          </article>
+          <article class="feed-card yellow-bg">
+            <span class="feed-tag">📝 Ejercicios</span>
+            <h3>Vocabulaire A1</h3>
+            <p>200 palabras esenciales en francés con pronunciación.</p>
+          </article>
+          <article class="feed-card orange-bg">
+            <span class="feed-tag">🎬 Video</span>
+            <h3>Clase grabada #8</h3>
+            <p>Repaso de tiempos verbales: present perfect vs simple past.</p>
+          </article>
+          <article class="feed-card pink-bg">
+            <span class="feed-tag">📖 Lectura</span>
+            <h3>La Boulangerie</h3>
+            <p>Texto de lectura en francés nivel A1 con glosario.</p>
+          </article>
+          <article class="feed-card grad-bg">
+            <span class="feed-tag">🔗 Recurso</span>
+            <h3>Plataforma BBC Learning</h3>
+            <p>Enlace a recursos complementarios en línea.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- EXÁMENES -->
+      <!-- futura DB: SELECT * FROM examenes WHERE materia_id IN (?) AND fecha >= NOW() -->
+      <section class="section" id="examenes">
+        <div class="section-head">
+          <span class="tag yellow">Exámenes</span>
+          <h2>Próximos exámenes</h2>
+          <p>Fechas y temas de tus evaluaciones.</p>
+        </div>
+        <div class="exam-grid">
+          <div class="exam-card glass">
+            <div class="exam-date">
+              <strong>20</strong>
+              <small>Mayo</small>
+            </div>
+            <div class="exam-info">
+              <strong>Examen Parcial — Inglés B1</strong>
+              <p>Temas: Present Perfect, Conditionals, Reading Comprehension</p>
+              <span class="task-badge pending">En 10 días</span>
+            </div>
+          </div>
+          <div class="exam-card glass">
+            <div class="exam-date">
+              <strong>25</strong>
+              <small>Mayo</small>
+            </div>
+            <div class="exam-info">
+              <strong>Quiz — Vocabulaire Français</strong>
+              <p>Temas: Les couleurs, Les chiffres, La famille</p>
+              <span class="task-badge pending">En 15 días</span>
+            </div>
+          </div>
+          <div class="exam-card glass">
+            <div class="exam-date">
+              <strong>05</strong>
+              <small>Mayo</small>
+            </div>
+            <div class="exam-info">
+              <strong>Examen Final — Conversación</strong>
+              <p>Presentación oral: 5 minutos en inglés con tema libre</p>
+              <span class="task-badge done">Aprobado 9.5 ✓</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALIFICACIONES -->
+      <!-- futura DB: SELECT * FROM calificaciones WHERE alumno_id = ? -->
+      <section class="section" id="calificaciones">
+        <div class="section-head">
+          <span class="tag purple">Calificaciones</span>
+          <h2>Mis calificaciones</h2>
+        </div>
+        <div class="cal-table glass">
+          <div class="cal-header">
+            <span>Materia</span>
+            <span>Parcial 1</span>
+            <span>Parcial 2</span>
+            <span>Final</span>
+            <span>Promedio</span>
+          </div>
+          <div class="cal-row">
+            <span>🇬🇧 Inglés Intermedio</span>
+            <span class="cal-grade hi">9.5</span>
+            <span class="cal-grade hi">9.0</span>
+            <span class="cal-grade mid">—</span>
+            <span class="cal-avg">9.2</span>
+          </div>
+          <div class="cal-row">
+            <span>🇫🇷 Francés Básico</span>
+            <span class="cal-grade hi">8.7</span>
+            <span class="cal-grade mid">—</span>
+            <span class="cal-grade mid">—</span>
+            <span class="cal-avg">8.7</span>
+          </div>
+          <div class="cal-row">
+            <span>🔤 Conversación Avanzada</span>
+            <span class="cal-grade hi">9.5</span>
+            <span class="cal-grade hi">9.0</span>
+            <span class="cal-grade hi">9.5</span>
+            <span class="cal-avg">9.3</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROGRESO -->
+      <!-- futura API: GET /api/alumno/{id}/progreso -->
+      <section class="section" id="progreso">
+        <div class="section-head">
+          <span class="tag orange">Mi progreso</span>
+          <h2>Avance del ciclo</h2>
+          <p>Visualización de tu desempeño general este ciclo.</p>
+        </div>
+        <div class="progreso-grid">
+          <div class="progreso-card glass">
+            <strong>Asistencia</strong>
+            <div class="progress-ring-wrap">
+              <svg viewBox="0 0 80 80" class="progress-ring">
+                <circle cx="40" cy="40" r="32" class="ring-bg"/>
+                <circle cx="40" cy="40" r="32" class="ring-fill" style="stroke-dasharray: 181; stroke-dashoffset: 18;"/>
+              </svg>
+              <span class="ring-label">90%</span>
+            </div>
+            <small>18 de 20 clases</small>
+          </div>
+          <div class="progreso-card glass">
+            <strong>Tareas entregadas</strong>
+            <div class="progress-ring-wrap">
+              <svg viewBox="0 0 80 80" class="progress-ring">
+                <circle cx="40" cy="40" r="32" class="ring-bg"/>
+                <circle cx="40" cy="40" r="32" class="ring-fill blue-ring" style="stroke-dasharray: 181; stroke-dashoffset: 36;"/>
+              </svg>
+              <span class="ring-label">80%</span>
+            </div>
+            <small>8 de 10 tareas</small>
+          </div>
+          <div class="progreso-card glass">
+            <strong>Promedio general</strong>
+            <div class="progress-ring-wrap">
+              <svg viewBox="0 0 80 80" class="progress-ring">
+                <circle cx="40" cy="40" r="32" class="ring-bg"/>
+                <circle cx="40" cy="40" r="32" class="ring-fill yellow-ring" style="stroke-dasharray: 181; stroke-dashoffset: 20;"/>
+              </svg>
+              <span class="ring-label">9.1</span>
+            </div>
+            <small>Excelente rendimiento</small>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <!-- / PANEL ALUMNO -->
+
+
+    <!-- ================================================================ -->
+    <!-- PANEL MAESTRO                                                     -->
+    <!-- futura DB: todos los datos de /api/maestro/{id}                  -->
+    <!-- ================================================================ -->
+    <div id="panelMaestro" style="display:none;">
+
+      <!-- HERO Maestro -->
+      <section class="hero glass" id="dashboard">
+        <div class="hero-text">
+          <span class="tag orange">Panel de Maestro</span>
+          <h1>Hola, <span class="grad" id="maestroNombre">Maestro</span> 👩‍🏫</h1>
+          <p>Gestiona a tus alumnos, sube materiales, crea exámenes y captura calificaciones desde un solo lugar.</p>
+          <div class="hero-cta">
+            <a href="#gestionar-alumnos" class="btn btn-primary">Ver mis Alumnos</a>
+            <a href="#metricas" class="btn btn-ghost">Ver Métricas</a>
+          </div>
+        </div>
+        <div class="hero-logo">
+          <div class="logo-ring">
+            <div class="logo-inner">
+              <span class="dl c1">d</span>
+              <span class="dl c2">a</span>
+              <span class="dl c3">l</span>
+              <span class="dl c4">i</span>
+              <span class="dl c5">o</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MÉTRICAS MAESTRO -->
+      <!-- futura API: GET /api/maestro/{id}/dashboard-stats -->
+      <section class="metrics">
+        <div class="metric glass">
+          <span class="m-label">Total alumnos</span>
+          <strong class="m-value">24</strong>
+          <span class="m-delta up">+2 este mes</span>
+        </div>
+        <div class="metric glass">
+          <span class="m-label">Tareas activas</span>
+          <strong class="m-value">6</strong>
+          <span class="m-delta down">3 por calificar</span>
+        </div>
+        <div class="metric glass">
+          <span class="m-label">Promedio grupal</span>
+          <strong class="m-value">8.7</strong>
+          <div class="bar"><span style="width:87%"></span></div>
+        </div>
+        <div class="metric glass">
+          <span class="m-label">Exámenes creados</span>
+          <strong class="m-value">4<small>/5</small></strong>
+          <span class="m-delta up">este ciclo</span>
+        </div>
+        <div class="metric glass">
+          <span class="m-label">Materiales subidos</span>
+          <strong class="m-value">18</strong>
+          <span class="m-delta up">en total</span>
+        </div>
+      </section>
+
+      <!-- GESTIÓN DE ALUMNOS -->
+      <!-- futura DB: SELECT alumnos.*, promedio FROM alumnos JOIN calificaciones WHERE maestro_id = ? -->
+      <section class="section" id="gestionar-alumnos">
+        <div class="section-head">
+          <span class="tag purple">Gestión</span>
+          <h2>Mis alumnos</h2>
+          <p>Lista de estudiantes inscritos en tus materias.</p>
+        </div>
+        <div class="alumnos-table glass">
+          <div class="cal-header">
+            <span>Alumno</span>
+            <span>Materia</span>
+            <span>Asistencia</span>
+            <span>Promedio</span>
+            <span>Estado</span>
+          </div>
+          <div class="cal-row">
+            <span>👤 Ana García</span>
+            <span>🇬🇧 Inglés B1</span>
+            <span class="cal-grade hi">95%</span>
+            <span class="cal-avg">9.5</span>
+            <span class="task-badge done">Activo</span>
+          </div>
+          <div class="cal-row">
+            <span>👤 Luis Torres</span>
+            <span>🇫🇷 Francés A1</span>
+            <span class="cal-grade mid">70%</span>
+            <span class="cal-avg">7.8</span>
+            <span class="task-badge pending">Atención</span>
+          </div>
+          <div class="cal-row">
+            <span>👤 María López</span>
+            <span>🇬🇧 Conversación</span>
+            <span class="cal-grade hi">100%</span>
+            <span class="cal-avg">9.8</span>
+            <span class="task-badge done">Activo</span>
+          </div>
+          <div class="cal-row">
+            <span>👤 Carlos Ruiz</span>
+            <span>🇬🇧 Inglés B1</span>
+            <span class="cal-grade hi">85%</span>
+            <span class="cal-avg">8.2</span>
+            <span class="task-badge done">Activo</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUBIR TAREAS -->
+      <!-- futura API: POST /api/tareas { titulo, materia_id, fecha_entrega, descripcion } -->
+      <section class="section" id="subir-tareas">
+        <div class="section-head">
+          <span class="tag orange">Tareas</span>
+          <h2>Crear nueva tarea</h2>
+          <p>Asigna tareas a tus grupos.</p>
+        </div>
+        <div class="form-card glass">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Título de la tarea</label>
+              <div class="form-input-wrap">
+                <input type="text" placeholder="Ej. Ensayo: My Weekend" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Materia</label>
+              <div class="form-input-wrap">
+                <select class="form-select">
+                  <option>🇬🇧 Inglés Intermedio B1</option>
+                  <option>🇫🇷 Francés Básico A1</option>
+                  <option>🔤 Conversación Avanzada</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Fecha de entrega</label>
+              <div class="form-input-wrap">
+                <input type="date" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Descripción / instrucciones</label>
+              <div class="form-input-wrap">
+                <input type="text" placeholder="Instrucciones para el alumno" />
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="align-self:flex-start;">
+            📋 Publicar Tarea
+          </button>
+          <p class="demo-hint"><!-- futura API: la tarea se guardará en DB y será visible para alumnos inscritos --></p>
+        </div>
+      </section>
+
+      <!-- CREAR EXÁMENES -->
+      <!-- futura API: POST /api/examenes { titulo, materia_id, fecha, temas } -->
+      <section class="section" id="crear-examenes">
+        <div class="section-head">
+          <span class="tag yellow">Exámenes</span>
+          <h2>Crear examen</h2>
+          <p>Programa una evaluación para tus grupos.</p>
+        </div>
+        <div class="form-card glass">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre del examen</label>
+              <div class="form-input-wrap">
+                <input type="text" placeholder="Ej. Parcial 2 — Inglés B1" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo</label>
+              <div class="form-input-wrap">
+                <select class="form-select">
+                  <option>Parcial</option>
+                  <option>Quiz</option>
+                  <option>Final</option>
+                  <option>Diagnóstico</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Materia</label>
+              <div class="form-input-wrap">
+                <select class="form-select">
+                  <option>🇬🇧 Inglés Intermedio B1</option>
+                  <option>🇫🇷 Francés Básico A1</option>
+                  <option>🔤 Conversación Avanzada</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha del examen</label>
+              <div class="form-input-wrap">
+                <input type="date" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Temas a evaluar</label>
+            <div class="form-input-wrap">
+              <input type="text" placeholder="Ej. Present Perfect, Conditionals, Reading" />
+            </div>
+          </div>
+          <button class="btn btn-primary" style="align-self:flex-start;">
+            📝 Publicar Examen
+          </button>
+        </div>
+      </section>
+
+      <!-- SUBIR MATERIALES -->
+      <!-- futura API: POST /api/materiales (multipart/form-data con archivo) -->
+      <section class="section" id="subir-materiales">
+        <div class="section-head">
+          <span class="tag blue">Materiales</span>
+          <h2>Subir material</h2>
+          <p>Comparte recursos con tus alumnos.</p>
+        </div>
+        <div class="upload-area glass" id="uploadArea">
+          <div class="upload-icon">📂</div>
+          <strong>Arrastra archivos aquí o haz clic</strong>
+          <small>PDF, Audio, Video, Imágenes · Máx 50MB</small>
+          <button class="btn btn-ghost" style="margin-top:8px;">Seleccionar archivo</button>
+          <!-- futura API: el archivo se sube a almacenamiento en la nube (S3/GCS) y la URL se guarda en DB -->
+        </div>
+        <div class="feed-grid" style="margin-top:0;">
+          <article class="feed-card purple-bg">
+            <span class="feed-tag">📄 PDF</span>
+            <h3>Grammar Guide B1</h3>
+            <p>Subido: 1 mayo · 🇬🇧 Inglés</p>
+          </article>
+          <article class="feed-card blue-bg">
+            <span class="feed-tag">🎧 Audio</span>
+            <h3>Listening Practice #3</h3>
+            <p>Subido: 3 mayo · 🇬🇧 Conversación</p>
+          </article>
+          <article class="feed-card yellow-bg">
+            <span class="feed-tag">📝 Ejercicios</span>
+            <h3>Vocabulaire A1</h3>
+            <p>Subido: 5 mayo · 🇫🇷 Francés</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- CAPTURAR CALIFICACIONES -->
+      <!-- futura DB: UPDATE calificaciones SET valor = ? WHERE alumno_id = ? AND examen_id = ? -->
+      <section class="section" id="capturar-calificaciones">
+        <div class="section-head">
+          <span class="tag purple">Calificaciones</span>
+          <h2>Capturar calificaciones</h2>
+          <p>Registra las calificaciones de tus alumnos.</p>
+        </div>
+        <div class="cal-table glass">
+          <div class="cal-header">
+            <span>Alumno</span>
+            <span>Materia</span>
+            <span>Examen</span>
+            <span>Calificación</span>
+            <span>Acción</span>
+          </div>
+          <div class="cal-row">
+            <span>👤 Ana García</span>
+            <span>🇬🇧 Inglés B1</span>
+            <span>Parcial 2</span>
+            <span><input type="number" class="grade-input" placeholder="0-10" min="0" max="10" step="0.1"/></span>
+            <span><button class="btn btn-primary" style="padding:6px 14px;font-size:12px;">Guardar</button></span>
+          </div>
+          <div class="cal-row">
+            <span>👤 Luis Torres</span>
+            <span>🇫🇷 Francés A1</span>
+            <span>Quiz 1</span>
+            <span><input type="number" class="grade-input" placeholder="0-10" min="0" max="10" step="0.1"/></span>
+            <span><button class="btn btn-primary" style="padding:6px 14px;font-size:12px;">Guardar</button></span>
+          </div>
+          <div class="cal-row">
+            <span>👤 María López</span>
+            <span>🔤 Conversación</span>
+            <span>Final</span>
+            <span><input type="number" class="grade-input" placeholder="0-10" min="0" max="10" step="0.1"/></span>
+            <span><button class="btn btn-primary" style="padding:6px 14px;font-size:12px;">Guardar</button></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- MÉTRICAS MAESTRO -->
+      <!-- futura API: GET /api/maestro/{id}/metricas -->
+      <section class="section" id="metricas">
+        <div class="section-head">
+          <span class="tag orange">Métricas</span>
+          <h2>Desempeño grupal</h2>
+          <p>Estadísticas de tus grupos este ciclo.</p>
+        </div>
+        <div class="progreso-grid">
+          <div class="progreso-card glass">
+            <strong>Asistencia promedio</strong>
+            <div class="progress-ring-wrap">
+              <svg viewBox="0 0 80 80" class="progress-ring">
+                <circle cx="40" cy="40" r="32" class="ring-bg"/>
+                <circle cx="40" cy="40" r="32" class="ring-fill" style="stroke-dasharray: 181; stroke-dashoffset: 27;"/>
+              </svg>
+              <span class="ring-label">85%</span>
+            </div>
+            <small>Todos los grupos</small>
+          </div>
+          <div class="progreso-card glass">
+            <strong>Tareas entregadas</strong>
+            <div class="progress-ring-wrap">
+              <svg viewBox="0 0 80 80" class="progress-ring">
+                <circle cx="40" cy="40" r="32" class="ring-bg"/>
+                <circle cx="40" cy="40" r="32" class="ring-fill blue-ring" style="stroke-dasharray: 181; stroke-dashoffset: 36;"/>
+              </svg>
+              <span class="ring-label">80%</span>
+            </div>
+            <small>144/180 tareas</small>
+          </div>
+          <div class="progreso-card glass">
+            <strong>Promedio grupal</strong>
+            <div class="progress-ring-wrap">
+              <svg viewBox="0 0 80 80" class="progress-ring">
+                <circle cx="40" cy="40" r="32" class="ring-bg"/>
+                <circle cx="40" cy="40" r="32" class="ring-fill yellow-ring" style="stroke-dasharray: 181; stroke-dashoffset: 23;"/>
+              </svg>
+              <span class="ring-label">8.7</span>
+            </div>
+            <small>Muy buen grupo</small>
+          </div>
+        </div>
+
+        <div class="compare">
+          <div class="compare-card before glass">
+            <h3 style="color:var(--blue)">🇬🇧 Grupo Inglés B1</h3>
+            <ul>
+              <li><strong>12 alumnos</strong> inscritos</li>
+              <li>Promedio: <strong>9.1</strong></li>
+              <li>Asistencia: <strong>92%</strong></li>
+              <li>3 tareas por calificar</li>
+            </ul>
+          </div>
+          <div class="compare-card after glass">
+            <h3 style="color:var(--orange)">🇫🇷 Grupo Francés A1</h3>
+            <ul>
+              <li><strong>12 alumnos</strong> inscritos</li>
+              <li>Promedio: <strong>8.4</strong></li>
+              <li>Asistencia: <strong>78%</strong></li>
+              <li>0 tareas por calificar</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <!-- / PANEL MAESTRO -->
+
+
+    <!-- ================================================================ -->
+    <!-- SECCIONES COMPARTIDAS (Alumno y Maestro)                         -->
+    <!-- ================================================================ -->
+
+    <!-- ARQUITECTURA -->
+    <section class="section" id="arquitectura">
+      <div class="section-head">
+        <span class="tag purple">Arquitectura distribuida</span>
+        <h2>Diagrama del sistema</h2>
+        <p>Tráfico balanceado entre nodos, caché compartida en Redis y base de datos con replicación master/replica.</p>
+      </div>
+
+      <div class="arch glass">
+        <div class="arch-row">
+          <div class="node lb" data-node="lb">Load Balancer<small>HAProxy / Nginx</small></div>
+        </div>
+        <svg class="arch-lines" viewBox="0 0 800 80" preserveAspectRatio="none">
+          <path d="M400,0 C400,40 200,40 200,80" />
+          <path d="M400,0 C400,40 400,40 400,80" />
+          <path d="M400,0 C400,40 600,40 600,80" />
+        </svg>
+        <div class="arch-row three">
+          <div class="node n1" data-node="n1">Nodo 1<small>App</small></div>
+          <div class="node n2" data-node="n2">Nodo 2<small>App</small></div>
+          <div class="node n3" data-node="n3">Nodo 3<small>App</small></div>
+        </div>
+        <svg class="arch-lines" viewBox="0 0 800 80" preserveAspectRatio="none">
+          <path d="M200,0 C200,40 250,40 250,80" />
+          <path d="M400,0 C400,40 500,40 500,80" />
+          <path d="M600,0 C600,40 750,40 750,80" />
+        </svg>
+        <div class="arch-row three">
+          <div class="node eval" data-node="eval">Nodo Evaluación</div>
+          <div class="node redis" data-node="redis">Redis<small>Cache / Sesiones</small></div>
+          <div class="node content" data-node="content">Nodo Contenido</div>
+        </div>
+        <svg class="arch-lines" viewBox="0 0 800 80" preserveAspectRatio="none">
+          <path d="M250,0 C250,40 300,40 300,80" />
+          <path d="M750,0 C750,40 600,40 600,80" />
+        </svg>
+        <div class="arch-row two">
+          <div class="node db master" data-node="dbm">DB Master<small>PostgreSQL</small></div>
+          <div class="node db replica" data-node="dbr">DB Replica<small>read-only</small></div>
+        </div>
+
+        <div class="legend">
+          <span><i class="leg purple"></i> App</span>
+          <span><i class="leg blue"></i> Cache</span>
+          <span><i class="leg orange"></i> Balanceador</span>
+          <span><i class="leg yellow"></i> Base de datos</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIMULADOR -->
+    <section class="section" id="simulador">
+      <div class="section-head">
+        <span class="tag orange">Simulador</span>
+        <h2>Probemos la carga</h2>
+        <p>Genera 1000 estudiantes simulados y observa cómo se distribuye la carga en tiempo real.</p>
+      </div>
+
+      <div class="sim glass">
+        <button id="simBtn" class="btn btn-primary big">⚡ Simular 1000 estudiantes</button>
+        <div class="sim-bars">
+          <div class="sim-node">
+            <span>Nodo 1</span>
+            <div class="bar"><span data-load="n1"></span></div>
+            <small data-load-val="n1">0%</small>
+          </div>
+          <div class="sim-node">
+            <span>Nodo 2</span>
+            <div class="bar"><span data-load="n2"></span></div>
+            <small data-load-val="n2">0%</small>
+          </div>
+          <div class="sim-node">
+            <span>Nodo 3</span>
+            <div class="bar"><span data-load="n3"></span></div>
+            <small data-load-val="n3">0%</small>
+          </div>
+        </div>
+        <p class="sim-status" id="simStatus">Sistema en reposo · esperando tráfico…</p>
+      </div>
+    </section>
+
+
+    <!-- FOOTER (actualizado) -->
+    <footer class="footer glass">
+      <div class="foot-col">
+        <strong>Dalio School</strong>
+        <small>Plataforma educativa distribuida</small>
+      </div>
+      <div class="foot-col">
+        <strong>💬 Nuestra misión</strong>
+        <small>Aprender es crecer, y crecer es avanzar.</small>
+      </div>
+      <div class="foot-col">
+        <strong>📍 Ubicación</strong>
+        <small>Apodaca, NL.</small>
+      </div>
+      <div class="foot-col foot-col-wide">
+        <strong>🌎 Idiomas · Niveles</strong>
+        <small>Inglés y Francés · Asesorías para primaria, secundaria y preparatoria</small>
+      </div>
+    </footer>
+
+  </main>
+</div>
+<!-- / APP PRINCIPAL -->
+
+<script src="script.js"></script>
+</body>
+</html>
